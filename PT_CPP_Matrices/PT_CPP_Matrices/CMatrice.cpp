@@ -2,6 +2,7 @@
 #define CMatrice_cpp
 
 #include "CMatrice.h"
+#include <math.h>
 
 /***********************************************************************
 ***** CMATRICE<MTYPE> : Constructeur par défaut de CMatrice<MTYPE> *****
@@ -35,21 +36,24 @@ template<class MTYPE> CMatrice<MTYPE>::CMatrice(CMatrice<MTYPE>& MATParam)
 {
 	//On teste si la matrice est vide 
 	if (MATParam.MATLireNbColonnes() == 0 || MATParam.MATLireNbLignes() == 0) {
-		CException EXCErreur;
-		EXCErreur.EXCModifierValeur(MatriceVide);
-		throw EXCErreur;
+		uiMATNbColonnes = 0;
+		uiMATNbLignes = 0;
+		pMATMatrice = NULL;
 	}
-	uiMATNbColonnes = MATParam.MATLireNbColonnes();
-	uiMATNbLignes = MATParam.MATLireNbLignes();
-	pMATMatrice = new MTYPE*[uiMATNbLignes];
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
-	}
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
-			pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = MATParam.MATLireElement(uiBoucleIndiceLigne, uiBoucleIndiceColonne);
+	else {
+		uiMATNbColonnes = MATParam.MATLireNbColonnes();
+		uiMATNbLignes = MATParam.MATLireNbLignes();
+		pMATMatrice = new MTYPE*[uiMATNbLignes];
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
+		}
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
+				pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = MATParam.MATLireElement(uiBoucleIndiceLigne, uiBoucleIndiceColonne);
+			}
 		}
 	}
+	
 };
 
 /***********************************************************************
@@ -69,19 +73,21 @@ template<class MTYPE> CMatrice<MTYPE>::CMatrice(unsigned int uiNbLignes, unsigne
 {
 	//On teste si la matrice est vide
 	if (uiNbLignes == 0 || uiNbColonnes == 0) {
-		CException EXCErreur;
-		EXCErreur.EXCModifierValeur(MatriceVide);
-		throw EXCErreur;
+		uiMATNbColonnes = 0;
+		uiMATNbLignes = 0;
+		pMATMatrice = NULL;
 	}
-	uiMATNbLignes = uiNbLignes;
-	uiMATNbColonnes = uiNbColonnes;
-	pMATMatrice = new MTYPE*[uiMATNbLignes];
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
-	}
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
-			pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = NULL;
+	else {
+		uiMATNbLignes = uiNbLignes;
+		uiMATNbColonnes = uiNbColonnes;
+		pMATMatrice = new MTYPE*[uiMATNbLignes];
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
+		}
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
+				pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = NULL;
+			}
 		}
 	}
 };
@@ -187,9 +193,10 @@ template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::operator=(CMatrice<MTYPE
 {
 	//On teste si la matrice est vide
 	if (MATParam.MATLireNbColonnes() == 0 || MATParam.MATLireNbLignes() == 0) {
-		CException EXCErreur;
-		EXCErreur.EXCModifierValeur(MatriceVide);
-		throw EXCErreur;
+		uiMATNbColonnes = 0;
+		uiMATNbLignes = 0;
+		pMATMatrice = NULL;
+		return *this;
 	}
 
 	//si la matrice n'est pas vide on vide la matrice avant de recopie l'autre matrice
@@ -507,6 +514,100 @@ template<class MTYPE> CMatrice<MTYPE>& operator/(double dParam, CMatrice<MTYPE> 
 		}
 	}
 	return *M1;
+}
+
+template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerColonne(unsigned int uiPositionColonne) {
+	
+	if (uiPositionColonne >= uiMATNbColonnes) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(DepassementLigneOuColonne);
+		throw EXCErreur;
+	}
+	unsigned int uiNbLignes, uiNbColonnes;
+	uiNbLignes = uiMATNbLignes;
+	uiNbColonnes = uiMATNbColonnes-1;
+	if (uiNbColonnes == 0 || uiNbLignes == 0) {
+		CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>();
+		return *MATParam;
+	}
+	CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>(uiNbLignes, uiNbColonnes);
+	for (unsigned int uiBoucleLignes = 0; uiBoucleLignes < uiNbLignes; uiBoucleLignes++) {
+		for (unsigned int uiBoucleColonne = 0; uiBoucleColonne < uiPositionColonne; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes][uiBoucleColonne]);
+		}
+		for (unsigned int uiBoucleColonne = uiPositionColonne; uiBoucleColonne < uiNbColonnes; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes][uiBoucleColonne+1]);
+		}
+	}
+	return *MATParam;
+}
+
+template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerLigne(unsigned int uiPositionLigne) {
+
+	if (uiPositionLigne >= uiMATNbLignes) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(DepassementLigneOuColonne);
+		throw EXCErreur;
+	}
+	unsigned int uiNbLignes, uiNbColonnes;
+	uiNbLignes = uiMATNbLignes-1;
+	uiNbColonnes = uiMATNbColonnes;
+	if (uiNbColonnes == 0 || uiNbLignes == 0) {
+		CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>();
+		return *MATParam;
+	}
+	CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>(uiNbLignes, uiNbColonnes);
+	for (unsigned int uiBoucleLignes = 0; uiBoucleLignes < uiPositionLigne; uiBoucleLignes++) {
+		for (unsigned int uiBoucleColonne = 0; uiBoucleColonne < uiNbColonnes; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes][uiBoucleColonne]);
+		}
+	}
+	for (unsigned int uiBoucleLignes = uiPositionLigne; uiBoucleLignes < uiNbLignes; uiBoucleLignes++) {
+		for (unsigned int uiBoucleColonne = 0; uiBoucleColonne < uiNbColonnes; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes+1][uiBoucleColonne]);
+		}
+	}
+	return *MATParam;
+}
+
+template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure(){
+	if (uiMATNbColonnes != uiMATNbLignes) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(10);
+		throw EXCErreur;
+	}
+	if (uiMATNbColonnes == 0) {
+		return 1;
+	}
+	if (uiMATNbColonnes == 1) {
+		return pMATMatrice[0][0];
+	}
+	double Somme = pMATMatrice[uiMATNbColonnes-1][uiMATNbLignes-1];
+	CMatrice<MTYPE> MATParam = (*this).MATSupprimerColonne(uiMATNbColonnes - 1);
+	MATParam = MATParam.MATSupprimerLigne(uiMATNbColonnes - 1);
+	Somme = Somme + MATParam.MATDeterminantHessenbergInferieure();
+	double Somme2=0;
+	for (unsigned int uiBoucle = 0; uiBoucle < uiMATNbColonnes - 1; uiBoucle++) {
+		double Somme3 = pow(-1, uiMATNbColonnes - (uiBoucle + 1));
+		for (unsigned int uiBoucle2 = uiBoucle; uiBoucle2 < uiMATNbColonnes - 1; uiBoucle2++) {
+			Somme3 = Somme3 *pMATMatrice[uiBoucle2][uiBoucle2 + 1];
+		}
+		Somme3 = Somme3 * pMATMatrice[uiMATNbColonnes - 1][uiBoucle];
+		if (uiBoucle + 1 - 1 == 0) {
+			CMatrice<MTYPE>* MATParam2 = new CMatrice<MTYPE>();
+			Somme3 = Somme3 * MATParam2->MATDeterminantHessenbergInferieure();
+		}
+		else{
+			CMatrice<MTYPE> MATParam2 =*this;
+			for (unsigned int uiBoucle2 = uiMATNbColonnes - 1; uiBoucle2 > uiBoucle; uiBoucle--) {
+				MATParam2 = MATParam2.MATSupprimerColonne(uiBoucle2);
+				MATParam2 = MATParam2.MATSupprimerLigne(uiBoucle2);
+			}
+			Somme3 = Somme3 * MATParam2.MATDeterminantHessenbergInferieure();
+		}
+		Somme2 = Somme2 + Somme3;
+	}
+	return Somme + Somme2;
 }
 
 #endif

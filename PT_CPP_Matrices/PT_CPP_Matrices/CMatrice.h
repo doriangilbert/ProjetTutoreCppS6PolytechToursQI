@@ -218,6 +218,12 @@ template<class MTYPE> class CMatrice
 		**********************************************************************************************************************************************/
 		CMatrice<MTYPE>& operator*(CMatrice<MTYPE> &MATParam); //Produit terme à terme ou produit matriciel
 
+		CMatrice<MTYPE>& MATSupprimerColonne(unsigned int uiPositionColonne);
+
+		CMatrice<MTYPE>& MATSupprimerLigne(unsigned int uiPositionLignes);
+
+		double MATDeterminantHessenbergInferieure();
+
 };
 
 #include "CMatrice.cpp"

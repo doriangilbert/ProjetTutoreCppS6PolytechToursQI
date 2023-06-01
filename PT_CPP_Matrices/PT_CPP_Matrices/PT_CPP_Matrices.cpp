@@ -80,6 +80,16 @@ int main(int argc,char* argv[])
 			catch (CException EXCErreur) {
 				cout << "ERREUR : Produit impossible : Tailles de Matrice non compatibles\n";
 			}
+			cout << "TEST DETERMINANT CHELOU\n";
+			try {
+				CMatrice<double> MTest(LISMATListeMatrice1[0]);
+				MTest.MATModifierElement(0, 2, 0);
+				MTest.MATAfficher();
+				cout << MTest.MATDeterminantHessenbergInferieure();
+			}
+			catch (CException EXCErreur) {
+				cout << "Erreur Supprimer Colonne";
+			}
 		}
 		catch (CException EXCErreur) {
 			if (EXCErreur.EXCLireValeur() == NomFichierManquant) cout << "ERREUR : Nom de fichier manquant\n";
