@@ -88,7 +88,7 @@ int main(int argc,char* argv[])
 				cout << MTest.MATDeterminantHessenbergInferieure();
 			}
 			catch (CException EXCErreur) {
-				cout << "Erreur Supprimer Colonne";
+				cout << EXCErreur.EXCLireValeur();
 			}
 		}
 		catch (CException EXCErreur) {

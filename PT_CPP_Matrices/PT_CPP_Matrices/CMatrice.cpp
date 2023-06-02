@@ -585,7 +585,7 @@ template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure
 	double Somme = pMATMatrice[uiMATNbColonnes-1][uiMATNbLignes-1];
 	CMatrice<MTYPE> MATParam = (*this).MATSupprimerColonne(uiMATNbColonnes - 1);
 	MATParam = MATParam.MATSupprimerLigne(uiMATNbColonnes - 1);
-	Somme = Somme + MATParam.MATDeterminantHessenbergInferieure();
+	Somme = Somme * MATParam.MATDeterminantHessenbergInferieure();
 	double Somme2=0;
 	for (unsigned int uiBoucle = 0; uiBoucle < uiMATNbColonnes - 1; uiBoucle++) {
 		double Somme3 = pow(-1, uiMATNbColonnes - (uiBoucle + 1));
@@ -599,7 +599,7 @@ template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure
 		}
 		else{
 			CMatrice<MTYPE> MATParam2 =*this;
-			for (unsigned int uiBoucle2 = uiMATNbColonnes - 1; uiBoucle2 > uiBoucle; uiBoucle--) {
+			for (unsigned int uiBoucle2 = uiMATNbColonnes - 1; uiBoucle2 >= uiBoucle; uiBoucle2--) {
 				MATParam2 = MATParam2.MATSupprimerColonne(uiBoucle2);
 				MATParam2 = MATParam2.MATSupprimerLigne(uiBoucle2);
 			}
