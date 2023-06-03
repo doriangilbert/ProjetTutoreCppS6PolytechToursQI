@@ -144,6 +144,7 @@ int main(int argc,char* argv[])
 		if (EXCErreur.EXCLireValeur() == NomFichierManquant) cout << "ERREUR : Nom de fichier manquant\n";
 		if (EXCErreur.EXCLireValeur() == EchecOuvertureFichier) cout << "ERREUR : Echec d'ouverture de fichier\n";
 		if (EXCErreur.EXCLireValeur() == FormatFichierInvalide) cout << "ERREUR : Format de fichier invalide\n";
+		if (EXCErreur.EXCLireValeur() == NEstPasUneMatriceHessenbergInferieure) cout << "ERREUR : La matrice passé en paramètre n'est une matrice de Hessenberg Inferieure";
 		if (EXCErreur.EXCLireValeur() == TypeMatriceFichierInvalide) cout << "ERREUR : Type de matrice non pris en charge (seul le type double est pris en charge)\n";
 		cout << "ERREUR : Code d'erreur : " << EXCErreur.EXCLireValeur() << endl;
 	}

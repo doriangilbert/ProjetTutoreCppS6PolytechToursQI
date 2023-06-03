@@ -12,6 +12,7 @@ using namespace std;
 #define DepassementLigneOuColonne 3 
 #define DivisionPar0 4 
 #define MatriceNonCarree 9
+#define NEstPasUneMatriceHessenbergInferieure 20
 
 //CMatrice est un patron de classe permettant de manipuler des matrices d'éléments de type quelconque (type générique MTYPE)
 template<class MTYPE> class CMatrice

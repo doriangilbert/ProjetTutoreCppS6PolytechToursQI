@@ -596,7 +596,9 @@ template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerLigne(unsign
 ***** Entrée :                                                                                                                   *****
 ***** Nécessite :                                                                                                                *****
 ***** Sortie : réel, valeur du déterminant de la matrice                                                                         *****
-***** Entraine : MATDeterminantHessenbergInferieure() = déterminant de la matrice                                                *****
+***** Entraine : MATDeterminantHessenbergInferieure() = déterminant de la matrice OU                                             *****
+***** Exception MatriceNonCarree : La matrice n'est pas carrée donc n'est pas une matrice de Hessenberg inferieure OU            *****
+***** Exception NEstPasUneMatriceHessenbergInferieure: Cette methode est faite pour les matrices de Hessenberg Inferieure        *****
 *************************************************************************************************************************************/
 template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure(){
 	if (uiMATNbColonnes != uiMATNbLignes) {
@@ -609,6 +611,20 @@ template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure
 	}
 	if (uiMATNbColonnes == 1) {
 		return pMATMatrice[0][0];
+	}
+	bool bNEstPasUneMatriceHessenbergInferieure=false;
+	for (unsigned int uiBoucleLignes = 0; uiBoucleLignes < uiMATNbColonnes - 2; uiBoucleLignes++) {
+		for (unsigned int uiBouclesColonnes = 2 + uiBoucleLignes; uiBouclesColonnes < uiMATNbColonnes; uiBouclesColonnes++) {
+			if (pMATMatrice[uiBoucleLignes][uiBouclesColonnes] != 0) {
+				bNEstPasUneMatriceHessenbergInferieure = true;
+			}
+		}
+	}
+	if (bNEstPasUneMatriceHessenbergInferieure) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(NEstPasUneMatriceHessenbergInferieure);
+		throw EXCErreur;
+
 	}
 	double dSomme = pMATMatrice[uiMATNbColonnes-1][uiMATNbLignes-1];
 	CMatrice<MTYPE> MATParam = (*this).MATSupprimerColonne(uiMATNbColonnes - 1);
