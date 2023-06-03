@@ -516,6 +516,16 @@ template<class MTYPE> CMatrice<MTYPE>& operator/(double dParam, CMatrice<MTYPE> 
 	return *M1;
 }
 
+/********************************************************************************************************************
+***** MATSUPPRIMERCOLONNE : Fonction permettant de supprimer une colonne à une position donnée dans une matrice *****
+*********************************************************************************************************************
+***** Entrée : uiPositionColonne, entier non signé, position dans la matrice de la colonne à supprimer          *****
+***** Nécessite :                                                                                               *****
+***** Sortie : objet CMatrice<MTYPE>, retourné par référence                                                    *****
+***** Entraine : Un objet CMatrice<MTYPE> à été initialisé correspondant à la matrice de départ soustraite de   *****
+***** la colonne à la position uiPositionColonne OU                                                             *****
+***** Exception DepassementLigneOuColonne : On tente de supprimer une colonne qui n'est pas dans la matrice     *****
+********************************************************************************************************************/
 template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerColonne(unsigned int uiPositionColonne) {
 	
 	if (uiPositionColonne >= uiMATNbColonnes) {
@@ -542,6 +552,16 @@ template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerColonne(unsi
 	return *MATParam;
 }
 
+/****************************************************************************************************************
+***** MATSUPPRIMERLIGNE : Fonction permettant de supprimer une ligne à une position donnée dans une matrice *****
+*****************************************************************************************************************
+***** Entrée : uiPositionLignes, entier non signé, position dans la matrice de la ligne à supprimer         *****
+***** Nécessite :                                                                                           *****
+***** Sortie : objet CMatrice<MTYPE>, retourné par référence                                                *****
+***** Entraine : Un objet CMatrice<MTYPE> à été initialisé correspondant à la matrice de départ soustraite  *****
+***** de la ligne à la position uiPositionLignes OU                                                         *****
+***** Exception DepassementLigneOuColonne : On tente de supprimer une ligne qui n'est pas dans la matrice   *****
+****************************************************************************************************************/
 template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerLigne(unsigned int uiPositionLigne) {
 
 	if (uiPositionLigne >= uiMATNbLignes) {
@@ -570,10 +590,18 @@ template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerLigne(unsign
 	return *MATParam;
 }
 
+/*************************************************************************************************************************************
+***** MATDETERMINANTHESSENBERGINFERIEURE : Fonction permettant de calculer le déterminant d'une matrice de Hessenberg inférieure *****
+**************************************************************************************************************************************
+***** Entrée :                                                                                                                   *****
+***** Nécessite :                                                                                                                *****
+***** Sortie : réel, valeur du déterminant de la matrice                                                                         *****
+***** Entraine : MATDeterminantHessenbergInferieure() = déterminant de la matrice                                                *****
+*************************************************************************************************************************************/
 template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure(){
 	if (uiMATNbColonnes != uiMATNbLignes) {
 		CException EXCErreur;
-		EXCErreur.EXCModifierValeur(10);
+		EXCErreur.EXCModifierValeur(MatriceNonCarree);
 		throw EXCErreur;
 	}
 	if (uiMATNbColonnes == 0) {
@@ -582,20 +610,20 @@ template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure
 	if (uiMATNbColonnes == 1) {
 		return pMATMatrice[0][0];
 	}
-	double Somme = pMATMatrice[uiMATNbColonnes-1][uiMATNbLignes-1];
+	double dSomme = pMATMatrice[uiMATNbColonnes-1][uiMATNbLignes-1];
 	CMatrice<MTYPE> MATParam = (*this).MATSupprimerColonne(uiMATNbColonnes - 1);
 	MATParam = MATParam.MATSupprimerLigne(uiMATNbColonnes - 1);
-	Somme = Somme * MATParam.MATDeterminantHessenbergInferieure();
-	double Somme2=0;
+	dSomme = dSomme * MATParam.MATDeterminantHessenbergInferieure();
+	double dSomme2=0;
 	for (unsigned int uiBoucle = 0; uiBoucle < uiMATNbColonnes - 1; uiBoucle++) {
-		double Somme3 = pow(-1, uiMATNbColonnes - (uiBoucle + 1));
+		double dSomme3 = pow(-1, uiMATNbColonnes - (uiBoucle + 1));
 		for (unsigned int uiBoucle2 = uiBoucle; uiBoucle2 < uiMATNbColonnes - 1; uiBoucle2++) {
-			Somme3 = Somme3 *pMATMatrice[uiBoucle2][uiBoucle2 + 1];
+			dSomme3 = dSomme3 *pMATMatrice[uiBoucle2][uiBoucle2 + 1];
 		}
-		Somme3 = Somme3 * pMATMatrice[uiMATNbColonnes - 1][uiBoucle];
+		dSomme3 = dSomme3 * pMATMatrice[uiMATNbColonnes - 1][uiBoucle];
 		if (uiBoucle + 1 - 1 == 0) {
 			CMatrice<MTYPE>* MATParam2 = new CMatrice<MTYPE>();
-			Somme3 = Somme3 * MATParam2->MATDeterminantHessenbergInferieure();
+			dSomme3 = dSomme3 * MATParam2->MATDeterminantHessenbergInferieure();
 		}
 		else{
 			CMatrice<MTYPE> MATParam2 =*this;
@@ -603,11 +631,11 @@ template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure
 				MATParam2 = MATParam2.MATSupprimerColonne(uiBoucle2);
 				MATParam2 = MATParam2.MATSupprimerLigne(uiBoucle2);
 			}
-			Somme3 = Somme3 * MATParam2.MATDeterminantHessenbergInferieure();
+			dSomme3 = dSomme3 * MATParam2.MATDeterminantHessenbergInferieure();
 		}
-		Somme2 = Somme2 + Somme3;
+		dSomme2 = dSomme2 + dSomme3;
 	}
-	return Somme + Somme2;
+	return dSomme + dSomme2;
 }
 
 #endif
