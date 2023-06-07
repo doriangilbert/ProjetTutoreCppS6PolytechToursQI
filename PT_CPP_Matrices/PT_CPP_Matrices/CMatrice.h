@@ -11,6 +11,8 @@ using namespace std;
 #define MatriceVide 2 
 #define DepassementLigneOuColonne 3 
 #define DivisionPar0 4 
+#define MatriceNonCarree 9
+#define NEstPasUneMatriceHessenbergInferieure 20
 
 //CMatrice est un patron de classe permettant de manipuler des matrices d'éléments de type quelconque (type générique MTYPE)
 template<class MTYPE> class CMatrice
@@ -217,6 +219,40 @@ template<class MTYPE> class CMatrice
 		***** Exception MatriceVide :  Une des matrices est vide                                                                                  *****
 		**********************************************************************************************************************************************/
 		CMatrice<MTYPE>& operator*(CMatrice<MTYPE> &MATParam); //Produit terme à terme ou produit matriciel
+
+		/********************************************************************************************************************
+		***** MATSUPPRIMERCOLONNE : Fonction permettant de supprimer une colonne à une position donnée dans une matrice *****
+		*********************************************************************************************************************
+		***** Entrée : uiPositionColonne, entier non signé, position dans la matrice de la colonne à supprimer          *****
+		***** Nécessite :                                                                                               *****
+		***** Sortie : objet CMatrice<MTYPE>, retourné par référence                                                    *****
+		***** Entraine : Un objet CMatrice<MTYPE> à été initialisé correspondant à la matrice de départ soustraite de   *****
+		***** la colonne à la position uiPositionColonne OU                                                             *****
+		***** Exception DepassementLigneOuColonne : On tente de supprimer une colonne qui n'est pas dans la matrice     *****
+		********************************************************************************************************************/
+		CMatrice<MTYPE>& MATSupprimerColonne(unsigned int uiPositionColonne);
+
+		/****************************************************************************************************************
+		***** MATSUPPRIMERLIGNE : Fonction permettant de supprimer une ligne à une position donnée dans une matrice *****
+		*****************************************************************************************************************
+		***** Entrée : uiPositionLignes, entier non signé, position dans la matrice de la ligne à supprimer         *****
+		***** Nécessite :                                                                                           *****
+		***** Sortie : objet CMatrice<MTYPE>, retourné par référence                                                *****
+		***** Entraine : Un objet CMatrice<MTYPE> à été initialisé correspondant à la matrice de départ soustraite  *****
+		***** de la ligne à la position uiPositionLignes OU                                                         *****
+		***** Exception DepassementLigneOuColonne : On tente de supprimer une ligne qui n'est pas dans la matrice   *****
+		****************************************************************************************************************/
+		CMatrice<MTYPE>& MATSupprimerLigne(unsigned int uiPositionLignes);
+
+		/*************************************************************************************************************************************
+		***** MATDETERMINANTHESSENBERGINFERIEURE : Fonction permettant de calculer le déterminant d'une matrice de Hessenberg inférieure *****
+		**************************************************************************************************************************************
+		***** Entrée :                                                                                                                   *****
+		***** Nécessite :                                                                                                                *****
+		***** Sortie : réel, valeur du déterminant de la matrice                                                                         *****
+		***** Entraine : MATDeterminantHessenbergInferieure() = déterminant de la matrice                                                *****
+		*************************************************************************************************************************************/
+		double MATDeterminantHessenbergInferieure();
 
 };
 

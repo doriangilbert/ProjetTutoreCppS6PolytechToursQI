@@ -2,6 +2,7 @@
 #define CMatrice_cpp
 
 #include "CMatrice.h"
+#include <math.h>
 
 /***********************************************************************
 ***** CMATRICE<MTYPE> : Constructeur par défaut de CMatrice<MTYPE> *****
@@ -35,21 +36,24 @@ template<class MTYPE> CMatrice<MTYPE>::CMatrice(CMatrice<MTYPE>& MATParam)
 {
 	//On teste si la matrice est vide 
 	if (MATParam.MATLireNbColonnes() == 0 || MATParam.MATLireNbLignes() == 0) {
-		CException EXCErreur;
-		EXCErreur.EXCModifierValeur(MatriceVide);
-		throw EXCErreur;
+		uiMATNbColonnes = 0;
+		uiMATNbLignes = 0;
+		pMATMatrice = NULL;
 	}
-	uiMATNbColonnes = MATParam.MATLireNbColonnes();
-	uiMATNbLignes = MATParam.MATLireNbLignes();
-	pMATMatrice = new MTYPE*[uiMATNbLignes];
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
-	}
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
-			pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = MATParam.MATLireElement(uiBoucleIndiceLigne, uiBoucleIndiceColonne);
+	else {
+		uiMATNbColonnes = MATParam.MATLireNbColonnes();
+		uiMATNbLignes = MATParam.MATLireNbLignes();
+		pMATMatrice = new MTYPE*[uiMATNbLignes];
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
+		}
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
+				pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = MATParam.MATLireElement(uiBoucleIndiceLigne, uiBoucleIndiceColonne);
+			}
 		}
 	}
+	
 };
 
 /***********************************************************************
@@ -69,19 +73,21 @@ template<class MTYPE> CMatrice<MTYPE>::CMatrice(unsigned int uiNbLignes, unsigne
 {
 	//On teste si la matrice est vide
 	if (uiNbLignes == 0 || uiNbColonnes == 0) {
-		CException EXCErreur;
-		EXCErreur.EXCModifierValeur(MatriceVide);
-		throw EXCErreur;
+		uiMATNbColonnes = 0;
+		uiMATNbLignes = 0;
+		pMATMatrice = NULL;
 	}
-	uiMATNbLignes = uiNbLignes;
-	uiMATNbColonnes = uiNbColonnes;
-	pMATMatrice = new MTYPE*[uiMATNbLignes];
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
-	}
-	for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
-		for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
-			pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = NULL;
+	else {
+		uiMATNbLignes = uiNbLignes;
+		uiMATNbColonnes = uiNbColonnes;
+		pMATMatrice = new MTYPE*[uiMATNbLignes];
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			pMATMatrice[uiBoucleIndiceLigne] = new MTYPE[uiMATNbColonnes];
+		}
+		for (unsigned int uiBoucleIndiceLigne = 0; uiBoucleIndiceLigne < uiMATNbLignes; uiBoucleIndiceLigne++) {
+			for (unsigned int uiBoucleIndiceColonne = 0; uiBoucleIndiceColonne < uiMATNbColonnes; uiBoucleIndiceColonne++) {
+				pMATMatrice[uiBoucleIndiceLigne][uiBoucleIndiceColonne] = NULL;
+			}
 		}
 	}
 };
@@ -187,9 +193,10 @@ template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::operator=(CMatrice<MTYPE
 {
 	//On teste si la matrice est vide
 	if (MATParam.MATLireNbColonnes() == 0 || MATParam.MATLireNbLignes() == 0) {
-		CException EXCErreur;
-		EXCErreur.EXCModifierValeur(MatriceVide);
-		throw EXCErreur;
+		uiMATNbColonnes = 0;
+		uiMATNbLignes = 0;
+		pMATMatrice = NULL;
+		return *this;
 	}
 
 	//si la matrice n'est pas vide on vide la matrice avant de recopie l'autre matrice
@@ -507,6 +514,144 @@ template<class MTYPE> CMatrice<MTYPE>& operator/(double dParam, CMatrice<MTYPE> 
 		}
 	}
 	return *M1;
+}
+
+/********************************************************************************************************************
+***** MATSUPPRIMERCOLONNE : Fonction permettant de supprimer une colonne à une position donnée dans une matrice *****
+*********************************************************************************************************************
+***** Entrée : uiPositionColonne, entier non signé, position dans la matrice de la colonne à supprimer          *****
+***** Nécessite :                                                                                               *****
+***** Sortie : objet CMatrice<MTYPE>, retourné par référence                                                    *****
+***** Entraine : Un objet CMatrice<MTYPE> à été initialisé correspondant à la matrice de départ soustraite de   *****
+***** la colonne à la position uiPositionColonne OU                                                             *****
+***** Exception DepassementLigneOuColonne : On tente de supprimer une colonne qui n'est pas dans la matrice     *****
+********************************************************************************************************************/
+template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerColonne(unsigned int uiPositionColonne) {
+	
+	if (uiPositionColonne >= uiMATNbColonnes) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(DepassementLigneOuColonne);
+		throw EXCErreur;
+	}
+	unsigned int uiNbLignes, uiNbColonnes;
+	uiNbLignes = uiMATNbLignes;
+	uiNbColonnes = uiMATNbColonnes-1;
+	if (uiNbColonnes == 0 || uiNbLignes == 0) {
+		CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>();
+		return *MATParam;
+	}
+	CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>(uiNbLignes, uiNbColonnes);
+	for (unsigned int uiBoucleLignes = 0; uiBoucleLignes < uiNbLignes; uiBoucleLignes++) {
+		for (unsigned int uiBoucleColonne = 0; uiBoucleColonne < uiPositionColonne; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes][uiBoucleColonne]);
+		}
+		for (unsigned int uiBoucleColonne = uiPositionColonne; uiBoucleColonne < uiNbColonnes; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes][uiBoucleColonne+1]);
+		}
+	}
+	return *MATParam;
+}
+
+/****************************************************************************************************************
+***** MATSUPPRIMERLIGNE : Fonction permettant de supprimer une ligne à une position donnée dans une matrice *****
+*****************************************************************************************************************
+***** Entrée : uiPositionLignes, entier non signé, position dans la matrice de la ligne à supprimer         *****
+***** Nécessite :                                                                                           *****
+***** Sortie : objet CMatrice<MTYPE>, retourné par référence                                                *****
+***** Entraine : Un objet CMatrice<MTYPE> à été initialisé correspondant à la matrice de départ soustraite  *****
+***** de la ligne à la position uiPositionLignes OU                                                         *****
+***** Exception DepassementLigneOuColonne : On tente de supprimer une ligne qui n'est pas dans la matrice   *****
+****************************************************************************************************************/
+template<class MTYPE> CMatrice<MTYPE>& CMatrice<MTYPE>::MATSupprimerLigne(unsigned int uiPositionLigne) {
+
+	if (uiPositionLigne >= uiMATNbLignes) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(DepassementLigneOuColonne);
+		throw EXCErreur;
+	}
+	unsigned int uiNbLignes, uiNbColonnes;
+	uiNbLignes = uiMATNbLignes-1;
+	uiNbColonnes = uiMATNbColonnes;
+	if (uiNbColonnes == 0 || uiNbLignes == 0) {
+		CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>();
+		return *MATParam;
+	}
+	CMatrice<MTYPE>* MATParam = new CMatrice<MTYPE>(uiNbLignes, uiNbColonnes);
+	for (unsigned int uiBoucleLignes = 0; uiBoucleLignes < uiPositionLigne; uiBoucleLignes++) {
+		for (unsigned int uiBoucleColonne = 0; uiBoucleColonne < uiNbColonnes; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes][uiBoucleColonne]);
+		}
+	}
+	for (unsigned int uiBoucleLignes = uiPositionLigne; uiBoucleLignes < uiNbLignes; uiBoucleLignes++) {
+		for (unsigned int uiBoucleColonne = 0; uiBoucleColonne < uiNbColonnes; uiBoucleColonne++) {
+			MATParam->MATModifierElement(uiBoucleLignes, uiBoucleColonne, pMATMatrice[uiBoucleLignes+1][uiBoucleColonne]);
+		}
+	}
+	return *MATParam;
+}
+
+/*************************************************************************************************************************************
+***** MATDETERMINANTHESSENBERGINFERIEURE : Fonction permettant de calculer le déterminant d'une matrice de Hessenberg inférieure *****
+**************************************************************************************************************************************
+***** Entrée :                                                                                                                   *****
+***** Nécessite :                                                                                                                *****
+***** Sortie : réel, valeur du déterminant de la matrice                                                                         *****
+***** Entraine : MATDeterminantHessenbergInferieure() = déterminant de la matrice OU                                             *****
+***** Exception MatriceNonCarree : La matrice n'est pas carrée donc n'est pas une matrice de Hessenberg inferieure OU            *****
+***** Exception NEstPasUneMatriceHessenbergInferieure: Cette methode est faite pour les matrices de Hessenberg Inferieure        *****
+*************************************************************************************************************************************/
+template<class MTYPE> double CMatrice<MTYPE>::MATDeterminantHessenbergInferieure(){
+	if (uiMATNbColonnes != uiMATNbLignes) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(MatriceNonCarree);
+		throw EXCErreur;
+	}
+	if (uiMATNbColonnes == 0) {
+		return 1;
+	}
+	if (uiMATNbColonnes == 1) {
+		return pMATMatrice[0][0];
+	}
+	bool bNEstPasUneMatriceHessenbergInferieure=false;
+	for (unsigned int uiBoucleLignes = 0; uiBoucleLignes < uiMATNbColonnes - 2; uiBoucleLignes++) {
+		for (unsigned int uiBouclesColonnes = 2 + uiBoucleLignes; uiBouclesColonnes < uiMATNbColonnes; uiBouclesColonnes++) {
+			if (pMATMatrice[uiBoucleLignes][uiBouclesColonnes] != 0) {
+				bNEstPasUneMatriceHessenbergInferieure = true;
+			}
+		}
+	}
+	if (bNEstPasUneMatriceHessenbergInferieure) {
+		CException EXCErreur;
+		EXCErreur.EXCModifierValeur(NEstPasUneMatriceHessenbergInferieure);
+		throw EXCErreur;
+
+	}
+	double dSomme = pMATMatrice[uiMATNbColonnes-1][uiMATNbLignes-1];
+	CMatrice<MTYPE> MATParam = (*this).MATSupprimerColonne(uiMATNbColonnes - 1);
+	MATParam = MATParam.MATSupprimerLigne(uiMATNbColonnes - 1);
+	dSomme = dSomme * MATParam.MATDeterminantHessenbergInferieure();
+	double dSomme2=0;
+	for (unsigned int uiBoucle = 0; uiBoucle < uiMATNbColonnes - 1; uiBoucle++) {
+		double dSomme3 = pow(-1, uiMATNbColonnes - (uiBoucle + 1));
+		for (unsigned int uiBoucle2 = uiBoucle; uiBoucle2 < uiMATNbColonnes - 1; uiBoucle2++) {
+			dSomme3 = dSomme3 *pMATMatrice[uiBoucle2][uiBoucle2 + 1];
+		}
+		dSomme3 = dSomme3 * pMATMatrice[uiMATNbColonnes - 1][uiBoucle];
+		if (uiBoucle + 1 - 1 == 0) {
+			CMatrice<MTYPE>* MATParam2 = new CMatrice<MTYPE>();
+			dSomme3 = dSomme3 * MATParam2->MATDeterminantHessenbergInferieure();
+		}
+		else{
+			CMatrice<MTYPE> MATParam2 =*this;
+			for (unsigned int uiBoucle2 = uiMATNbColonnes - 1; uiBoucle2 >= uiBoucle; uiBoucle2--) {
+				MATParam2 = MATParam2.MATSupprimerColonne(uiBoucle2);
+				MATParam2 = MATParam2.MATSupprimerLigne(uiBoucle2);
+			}
+			dSomme3 = dSomme3 * MATParam2.MATDeterminantHessenbergInferieure();
+		}
+		dSomme2 = dSomme2 + dSomme3;
+	}
+	return dSomme + dSomme2;
 }
 
 #endif

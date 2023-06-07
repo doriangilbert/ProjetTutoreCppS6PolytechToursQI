@@ -4,10 +4,15 @@
 
 #include "CMatrice.h"
 #include "CLecteur.h"
+
 using namespace std;
+
+#define PasDeFichierEnArgument 10
+#define TropDArguments 11
 
 int main(int argc,char* argv[])
 {
+	/*
 	int iNombreParametres = (argc - 1);
 	//cout << iNombreParametres << "\n";
 	//On voit si on a bien des parametres en entrée
@@ -80,6 +85,16 @@ int main(int argc,char* argv[])
 			catch (CException EXCErreur) {
 				cout << "ERREUR : Produit impossible : Tailles de Matrice non compatibles\n";
 			}
+			cout << "TEST DETERMINANT CHELOU\n";
+			try {
+				CMatrice<double> MTest(LISMATListeMatrice1[0]);
+				MTest.MATModifierElement(0, 2, 0);
+				MTest.MATAfficher();
+				cout << MTest.MATDeterminantHessenbergInferieure();
+			}
+			catch (CException EXCErreur) {
+				cout << EXCErreur.EXCLireValeur();
+			}
 		}
 		catch (CException EXCErreur) {
 			if (EXCErreur.EXCLireValeur() == NomFichierManquant) cout << "ERREUR : Nom de fichier manquant\n";
@@ -92,5 +107,45 @@ int main(int argc,char* argv[])
 	}
 	else {
 		cout << "ERREUR : Pas de parametre \n";
+	}
+	*/
+
+	try 
+	{
+		if (argc == 1 || argc > 2)
+		{
+			if (argc == 1)
+			{
+				CException EXCErreur;
+				EXCErreur.EXCModifierValeur(PasDeFichierEnArgument);
+				throw EXCErreur;
+			}
+			if (argc > 2)
+			{
+				CException EXCErreur;
+				EXCErreur.EXCModifierValeur(TropDArguments);
+				throw EXCErreur;
+			}
+		}
+		else
+		{
+			cout << "TEST DETERMINANT MATRICE HESSENGERG INFERIEURE" << endl;
+			CLecteur* LECLecteur = new CLecteur(argv[1]);
+			CMatrice<double> MATMatrice = LECLecteur->LECLireFichierMatrice();
+			cout << "Affichage de la matrice : " << endl;
+			MATMatrice.MATAfficher();
+			cout << "Determinant = " << MATMatrice.MATDeterminantHessenbergInferieure() << endl;
+		}
+	}
+	catch (CException EXCErreur) 
+	{
+		if (EXCErreur.EXCLireValeur() == PasDeFichierEnArgument) cout << "ERREUR : Pas de nom de fichier specifie en argument\n";
+		if (EXCErreur.EXCLireValeur() == TropDArguments) cout << "ERREUR : Trop de fichiers specifies en argument (un fichier maximum)\n";
+		if (EXCErreur.EXCLireValeur() == NomFichierManquant) cout << "ERREUR : Nom de fichier manquant\n";
+		if (EXCErreur.EXCLireValeur() == EchecOuvertureFichier) cout << "ERREUR : Echec d'ouverture de fichier\n";
+		if (EXCErreur.EXCLireValeur() == FormatFichierInvalide) cout << "ERREUR : Format de fichier invalide\n";
+		if (EXCErreur.EXCLireValeur() == NEstPasUneMatriceHessenbergInferieure) cout << "ERREUR : La matrice passe en parametre n'est une matrice de Hessenberg Inferieure\n";
+		if (EXCErreur.EXCLireValeur() == TypeMatriceFichierInvalide) cout << "ERREUR : Type de matrice non pris en charge (seul le type double est pris en charge)\n";
+		cout << "ERREUR : Code d'erreur : " << EXCErreur.EXCLireValeur() << endl;
 	}
 }
